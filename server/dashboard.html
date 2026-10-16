@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101916"><title>Mil · Run intelligence</title>
+  <style>
+    :root{color-scheme:dark;--bg:#101916;--panel:#19231f;--line:#2d3c35;--muted:#9eaca4;--text:#eef5ef;--lime:#c8f169;--orange:#f6a66b}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% -10%,#304535 0,transparent 38%),var(--bg);color:var(--text);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+    main{max-width:1120px;margin:auto;padding:42px 28px 64px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:54px}.brand{font-weight:750;letter-spacing:.02em}.brand span{color:var(--lime)}.pill{border:1px solid var(--line);border-radius:99px;padding:7px 12px;color:var(--muted);font-size:12px}.hero{max-width:660px;margin-bottom:38px}.eyebrow{color:var(--lime);font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase}.hero h1{font-size:clamp(38px,7vw,72px);line-height:1.02;letter-spacing:-.055em;margin:14px 0}.hero p{color:var(--muted);font-size:17px;max-width:560px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.card{background:linear-gradient(145deg,#1d2923,#17201c);border:1px solid var(--line);border-radius:18px;padding:20px;min-height:126px}.label{font-size:12px;color:var(--muted)}.value{font-size:31px;letter-spacing:-.04em;margin-top:12px;font-weight:650}.unit{font-size:13px;color:var(--muted);font-weight:400;letter-spacing:0}.section{margin-top:42px}.section-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:14px}.section h2{font-size:20px;margin:0}.section-head small{color:var(--muted)}.empty{border:1px dashed #43564a;border-radius:18px;padding:34px;text-align:center;color:var(--muted)}.empty strong{display:block;color:var(--text);font-size:16px;margin-bottom:6px}.session-list{display:grid;gap:10px}.session{display:flex;justify-content:space-between;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px}.session small{color:var(--muted)}.status{color:var(--lime);font-size:12px}.foot{margin-top:42px;color:#718077;font-size:12px}@media(max-width:680px){main{padding:26px 18px 48px}.top{margin-bottom:38px}.grid{grid-template-columns:1fr}.card{min-height:95px}.value{margin-top:5px}.section-head{align-items:start;gap:8px;flex-direction:column}}
+  </style>
+</head>
+<body><main>
+  <header class="top"><div class="brand">Mil</span></div><div class="pill"><span class="status">●</span> &nbsp;Prototype dashboard</div></header>
+  <section class="hero"><div class="eyebrow">Training, understood</div><h1>Run with a little more insight.</h1><p>See how effort and conditions shape your running. Your activity data will turn into useful patterns over time.</p></section>
+  <section class="grid" aria-label="Latest activity metrics"><article class="card"><div class="label">Latest heart rate</div><div class="value" id="heart-rate">— <span class="unit">bpm</span></div></article><article class="card"><div class="label">Latest pace</div><div class="value" id="pace">— <span class="unit">min/km</span></div></article><article class="card"><div class="label">Samples received</div><div class="value" id="samples">0</div></article></section>
+  <section class="section"><div class="section-head"><h2>Recent runs</h2><small id="updated">Waiting for activity data</small></div><div id="sessions" class="empty"><strong>No runs yet</strong>Connect a watch activity to see it appear here.</div></section>
+  <div class="foot">Mil · Early development · Metrics are exploratory and not medical advice.</div>
+</main>
+<script>
+const el=id=>document.getElementById(id);
+function duration(seconds){if(!seconds)return '—';const m=Math.floor(seconds/60);return `${m} min`;}
+async function refresh(){try{const r=await fetch('/api/v1/sessions');if(!r.ok)throw new Error();const {sessions=[]}=await r.json();const root=el('sessions');
+  if(!sessions.length){root.className='empty';root.innerHTML='<strong>No runs yet</strong>Connect a watch activity to see it appear here.';el('updated').textContent='Waiting for activity data';el('samples').textContent='0';return;}
+  const total=sessions.reduce((n,s)=>n+Number(s.sample_count||0),0);el('samples').textContent=total.toLocaleString();el('updated').textContent=`${sessions.length} ${sessions.length===1?'run':'runs'} recorded`;
+  root.className='session-list';root.replaceChildren(...sessions.map(s=>{const row=document.createElement('article');row.className='session';const left=document.createElement('div');const strong=document.createElement('strong');strong.textContent=new Date(s.started_at).toLocaleString();const sub=document.createElement('small');sub.textContent=` · ${s.sample_count} samples`;left.append(strong,sub);const right=document.createElement('div');right.innerHTML=`${duration(s.duration_seconds)} <small> · ${s.avg_heart_rate_bpm?Math.round(s.avg_heart_rate_bpm)+' bpm avg':'heart rate —'}</small>`;row.append(left,right);row.onclick=()=>loadLatest(s.session_id);row.style.cursor='pointer';return row;}));await loadLatest(sessions[0].session_id);
+ }catch{el('updated').textContent='Server unavailable';}}
+async function loadLatest(id){try{const r=await fetch(`/api/v1/sessions/${encodeURIComponent(id)}`);if(!r.ok)return;const d=await r.json();const s=d.samples.at(-1);if(!s)return;el('heart-rate').innerHTML=`${s.heart_rate_bpm??'—'} <span class="unit">bpm</span>`;el('pace').innerHTML=`${s.speed_mps>0?(1000/s.speed_mps/60).toFixed(1):'—'} <span class="unit">min/km</span>`;}catch{}}
+refresh();setInterval(refresh,10000);
+</script></body></html>

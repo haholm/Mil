@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<manifest>
+    <application id="" type="watch-app" name="Mil" entry="MilApp" minApiLevel="3.2.0">
+        <products>
+            <product id="fr955solar" />
+        </products>
+        <permissions>
+            <permission id="Sensor" />
+            <permission id="Communications" />
+        </permissions>
+    </application>
+</manifest>
