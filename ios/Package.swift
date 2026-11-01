@@ -18,13 +18,14 @@ let package = Package(
             dependencies: [
                 "ConnectIQ"
             ],
+            path: "Sources",
             linkerSettings: [
                 .unsafeFlags(["-Xlinker", "-ObjC"])
             ]
         ),
         .binaryTarget(
             name: "ConnectIQ",
-            path: "ConnectIQ/ConnectIQ.xcframework"
+            path: "Packages/ConnectIQ/ConnectIQ.xcframework"
         )
     ]
 )
