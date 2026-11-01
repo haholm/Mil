@@ -39,6 +39,7 @@ actor SampleUploader {
     private let endpoint: URL
     private let sessionID: String
     private var pending: [RunSample] = []
+    private var isUploading = false
 
     init(serverURL: URL, sessionID: String) {
         self.endpoint = serverURL.appending(path: "api/v1/sessions/\(sessionID)/samples")
@@ -49,19 +50,28 @@ actor SampleUploader {
         pending.append(sample)
     }
 
-    func uploadPending() async throws {
-        guard !pending.isEmpty else { return }
+    func uploadPending() async throws -> Int {
+        guard !pending.isEmpty, !isUploading else { return 0 }
+        isUploading = true
+        defer { isUploading = false }
+        let batchSamples = pending
         var request = URLRequest(url: endpoint)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        let batch = SampleBatch(device: "forerunner-955-solar", samples: pending)
+        let batch = SampleBatch(device: "forerunner-955-solar", samples: batchSamples)
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
         request.httpBody = try encoder.encode(batch)
-        let (_, response) = try await URLSession.shared.data(for: request)
-        guard (response as? HTTPURLResponse).map({ (200..<300).contains($0.statusCode) }) == true else {
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let http = response as? HTTPURLResponse else {
             throw URLError(.badServerResponse)
         }
-        pending.removeAll(keepingCapacity: true)
+        guard (200..<300).contains(http.statusCode) else {
+            let detail = String(data: data, encoding: .utf8) ?? "No response body"
+            throw NSError(domain: "MilUpload", code: http.statusCode, userInfo: [NSLocalizedDescriptionKey: "Server returned HTTP \(http.statusCode): \(detail)"])
+        }
+        let acknowledged = min(batchSamples.count, pending.count)
+        pending.removeFirst(acknowledged)
+        return acknowledged
     }
 }

@@ -2,6 +2,25 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <key>CFBundleDisplayName</key>
+    <string>Mil</string>
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>mil-8697cb47-b483-4c71-8336-c2806d48aaee</string>
+            </array>
+        </dict>
+    </array>
+    <key>LSApplicationQueriesSchemes</key>
+    <array>
+        <string>gcm-ciq</string>
+    </array>
+    <key>NSBluetoothAlwaysUsageDescription</key>
+    <string>Mil uses Bluetooth to receive activity metrics from your Garmin watch.</string>
+    <key>NSBluetoothPeripheralUsageDescription</key>
+    <string>Mil uses Bluetooth to receive activity metrics from your Garmin watch.</string>
     <key>NSAppTransportSecurity</key>
     <dict>
         <key>NSAllowsLocalNetworking</key>

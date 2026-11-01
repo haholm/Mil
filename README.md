@@ -6,7 +6,7 @@ An early foundation for a running analysis app: Garmin Forerunner 955 Solar → 
 
 - `server/`: a dependency-free Python API, SQLite storage, and a small responsive dashboard.
 - `garmin/Mil/`: Connect IQ Data Field for the Forerunner 955 Solar, with temporary live-metric and BLE diagnostics.
-- `ios/`: iOS bridge and in-app dashboard integration notes.
+- `ios/`: iOS dashboard, Connect IQ receiver, and sample uploader to the server API.
 - `docs/`: the shared sample contract and architecture decisions.
 
 ## Run the server
