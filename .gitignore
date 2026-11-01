@@ -1,1 +1,3 @@
-*.sqlite3
+# Top level
+.DS_Store
+.vscode

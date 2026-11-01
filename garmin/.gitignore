@@ -1,0 +1,15 @@
+# Build artifacts
+bin
+build
+gen
+*.prg
+*.prg.debug.xml
+*.iq
+*.mir
+
+# Intermediate / Internal Files
+/internal-mir/
+
+# Developer Key (NEVER commit your private key!)
+*.der
+developer_key*
