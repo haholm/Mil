@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101916">
+  <title>Run details · Mil</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="min-h-screen bg-[#101916] text-[#eef5ef] antialiased">
+  <main class="mx-auto max-w-6xl px-5 py-8 sm:px-8 sm:py-12">
+    <header class="mb-12 flex items-center justify-between">
+      <a href="/" class="text-xl font-extrabold tracking-tight">Mil<span class="text-lime-300">.</span></a>
+      <a href="/" class="rounded-full border border-white/10 px-4 py-2 text-sm text-slate-300 hover:border-lime-300/50">← All runs</a>
+    </header>
+    <section>
+      <p class="text-xs font-bold uppercase tracking-[0.22em] text-lime-300">Activity samples</p>
+      <h1 class="mt-3 break-all text-3xl font-semibold tracking-tight">{{ session_id }}</h1>
+      <p class="mt-2 text-slate-400">{{ samples | length }} samples in this run</p>
+    </section>
+    <div class="mt-8 overflow-x-auto rounded-2xl border border-white/10">
+      <table class="w-full min-w-[760px] text-left text-sm">
+        <thead class="bg-[#19231f] text-xs uppercase tracking-wide text-slate-400">
+          <tr>
+            <th class="px-4 py-3">Recorded at</th><th class="px-4 py-3">Elapsed</th>
+            <th class="px-4 py-3">Heart rate</th><th class="px-4 py-3">Cadence</th>
+            <th class="px-4 py-3">Speed</th><th class="px-4 py-3">Power</th><th class="px-4 py-3">Altitude</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-white/5">
+          {% for sample in samples %}
+            <tr class="odd:bg-white/[0.02]">
+              <td class="whitespace-nowrap px-4 py-3 text-slate-300">{{ sample.recorded_at }}</td>
+              <td class="px-4 py-3">{{ "%.1f" | format(sample.elapsed_seconds) }} s</td>
+              <td class="px-4 py-3">{{ sample.heart_rate_bpm if sample.heart_rate_bpm is not none else "—" }}</td>
+              <td class="px-4 py-3">{{ sample.cadence_spm if sample.cadence_spm is not none else "—" }}</td>
+              <td class="px-4 py-3">{{ sample.speed_mps if sample.speed_mps is not none else "—" }}</td>
+              <td class="px-4 py-3">{{ sample.running_power_w if sample.running_power_w is not none else "—" }}</td>
+              <td class="px-4 py-3">{{ sample.altitude_m if sample.altitude_m is not none else "—" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </main>
+</body>
+</html>
